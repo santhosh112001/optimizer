@@ -71,14 +71,11 @@ data = pd.concat(all_batches, ignore_index=True)
 # -------------------------
 # STEP 3: Export to Excel
 # -------------------------
-param_df = pd.DataFrame({
-    'Parameter': ['Xm', 'mum', 'alpha', 'beta'],
-    'Value': [Xm_fit, mum_fit, alpha_fit, beta_fit]
-})
 
-with pd.ExcelWriter("dha_ann_ga_kinetic_output.xlsx") as writer:
-    param_df.to_excel(writer, index=False, sheet_name='Kinetic_Parameters')
-    data.to_excel(writer, index=False, sheet_name='ANN_Input_Data')
+# ---------------------------------
+
+
+
 
 # -------------------------
 # STEP 4: Train ANN
@@ -99,7 +96,9 @@ model.fit(X_scaled, y_scaled.ravel())
 # -------------------------
 def fitness_func(ga_instance, solution, solution_idx):
     input_array = np.array(solution).reshape(1, -1)
-    input_scaled = x_scaler.transform(input_array)
+    input_df = pd.DataFrame([solution], columns=X.columns)
+    input_scaled = x_scaler.transform(input_df)
+
     prediction = model.predict(input_scaled)
     dha = y_scaler.inverse_transform(prediction.reshape(-1, 1))[0, 0]
     return dha
